@@ -1,5 +1,5 @@
 public class Cargo {
-    private Dimensions dimensions;
+    private final Dimensions dimensions;
     private final double mass;
     private final String deliveryAddress;
     private final boolean canFlip;
