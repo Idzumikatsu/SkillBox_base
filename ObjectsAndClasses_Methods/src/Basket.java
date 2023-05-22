@@ -1,34 +1,62 @@
-public class Basket {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static int count = 0;
-    private String items = "";
-    private int totalPrice = 0;
-    private int limit;
-    private double totalWeight = 0;
+public class Basket {
+    private static int allBasketsPrice = 0;
+    private static int allBasketsItemsCount = 0;
+    private static int basketsCount = 0;
+
+    private List<String> items;
+    private int priceLimit;
+    private int oneBasketItemsCount = 0;
+    private int oneBasketPrice = 0;
+    private double basketWeight = 0;
+
 
     public Basket() {
-        increaseCount(1);
-        items = "Список товаров:";
-        this.limit = 1000000;
+        increaseBasketsCount(1);
+        this.items = new ArrayList<>();
+        this.priceLimit = 1000000;
     }
 
-    public Basket(int limit) {
+    public Basket(int priceLimit) {
         this();
-        this.limit = limit;
+        this.priceLimit = priceLimit;
     }
 
-    public Basket(String items, int totalPrice) {
+    public Basket(String items, int oneBasketPrice) {
         this();
-        this.items = this.items + items;
-        this.totalPrice = totalPrice;
+        this.items.add(items);
+        this.oneBasketPrice = oneBasketPrice;
+        increaseOneBasketItemsCount(1);
     }
 
-    public static int getCount() {
-        return count;
+    public static int getBasketsCount() {
+        return basketsCount;
     }
 
-    public static void increaseCount(int count) {
-        Basket.count = Basket.count + count;
+    public int getOneBasketItemsCount() {
+        return oneBasketItemsCount;
+    }
+
+    private static void increaseBasketsCount(int count) {
+        basketsCount += count;
+    }
+
+    private void increaseOneBasketItemsCount(int count) {
+        oneBasketItemsCount += count;
+    }
+
+    private void increaseAllBasketsItemsCount(int count) {
+        allBasketsItemsCount += count;
+    }
+
+    public static int getAllBasketsPrice() {
+        return allBasketsPrice;
+    }
+
+    public static int getAllBasketsItemsCount() {
+        return allBasketsItemsCount;
     }
 
     public void add(String name, int price) {
@@ -36,54 +64,70 @@ public class Basket {
     }
 
     public void add(String name, int price, int count) {
-        boolean error = false;
-        if (contains(name)) {
-            error = true;
-        }
+        boolean error = items.stream().anyMatch(item -> item.contains(name));
 
-        if (totalPrice + count * price >= limit) {
+        if (oneBasketPrice + count * price >= priceLimit) {
             error = true;
         }
 
         if (error) {
-            System.out.println("Error occured :(");
-            return;
+            System.out.println("Вы пытались добавить товар " + name + ", который уже есть в корзине");
+        } else {
+            items.add(name + " - " + count + " шт. - " + price + " Руб.");
+            oneBasketPrice += count * price;
+            incAllBasketPrice(count * price);
+            increaseOneBasketItemsCount(count);
+            increaseAllBasketsItemsCount(count);
         }
-
-        items = items + "\n" + name + " - " +
-            count + " шт. - " + price;
-        totalPrice = totalPrice + count * price;
     }
 
-    public void add (String name, int price, int count, double weight){
+    public void add(String name, int price, int count, double weight) {
         add(name, price, count);
-        totalWeight += weight * count;
+        basketWeight += weight * count;
     }
 
-    public double getTotalWeight() {
-        return totalWeight;
+    public double getBasketWeight() {
+        return basketWeight;
     }
 
     public void clear() {
-        items = "";
-        totalPrice = 0;
-        totalWeight = 0;
+        items.clear();
+        basketWeight = 0;
+
+        if ((allBasketsItemsCount - oneBasketItemsCount) >= 0) {
+            allBasketsItemsCount -= oneBasketItemsCount;
+        }
+        oneBasketItemsCount = 0;
+
+        if ((allBasketsPrice - oneBasketPrice) >= 0) {
+            allBasketsPrice -= oneBasketPrice;
+        }
+        oneBasketPrice = 0;
     }
 
-    public int getTotalPrice() {
-        return totalPrice;
+    public int getOneBasketPrice() {
+        return oneBasketPrice;
     }
 
-    public boolean contains(String name) {
-        return items.contains(name);
+
+    private static void incAllBasketPrice(int count) {
+        allBasketsPrice += count;
     }
 
-    public void print(String title) {
-        System.out.println(title);
-        if (items.isEmpty()) {
-            System.out.println("Корзина пуста");
+    public static int calcAvgItemPrice() {
+        return getAllBasketsPrice() / getAllBasketsItemsCount();
+    }
+
+    public static int calcAvgBasketPrice() {
+        return getAllBasketsPrice() / getBasketsCount();
+    }
+
+    public void print() {
+        if (!items.isEmpty()) {
+            System.out.println("Товары в корзине: ");
+            items.forEach(System.out::println);
         } else {
-            System.out.println(items);
+            System.out.println("Корзина пуста");
         }
     }
 }
