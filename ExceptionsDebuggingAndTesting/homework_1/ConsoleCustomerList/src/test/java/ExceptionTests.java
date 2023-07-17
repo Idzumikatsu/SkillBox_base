@@ -33,13 +33,13 @@ public class ExceptionTests {
     }
 
     @Test
-    @DisplayName("Неверный формат email")
+    @DisplayName("Неверный формат EMAIL")
     void wrongEmailFormatWithoutAt() {
         final String wrongEmail = "thisIsNotAnEmail";
         final String input = "Василий Петров " + wrongEmail + " +79215637722";
 
         assertThrows(Throwable.class, () -> storage.addCustomer(input),
-                "Не выброшено исключение при неверном формате email -> " + wrongEmail);
+                "Не выброшено исключение при неверном формате EMAIL -> " + wrongEmail);
     }
 
     @Test
@@ -64,8 +64,8 @@ public class ExceptionTests {
         assertEquals(1, storage.getCount());
 
         Customer customer = storage.getCustomer(name);
-        assertEquals(name, customer.getName());
-        assertEquals(email, customer.getEmail());
-        assertEquals(phone, customer.getPhone());
+        assertEquals(name, customer.name());
+        assertEquals(email, customer.email());
+        assertEquals(phone, customer.phone());
     }
 }
