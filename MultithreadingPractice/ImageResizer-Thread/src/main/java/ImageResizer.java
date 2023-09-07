@@ -2,7 +2,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
-public class ImageResizer extends Thread{
+public class ImageResizer implements Runnable{
 
     private File[] files;
     private int newWidth;
