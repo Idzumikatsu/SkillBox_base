@@ -1,3 +1,5 @@
+
+
 import org.imgscalr.Scalr;
 
 import javax.imageio.ImageIO;
