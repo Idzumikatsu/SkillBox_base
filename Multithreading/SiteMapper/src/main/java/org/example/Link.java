@@ -1,15 +1,15 @@
 package org.example;
 
+import java.util.Objects;
+
 public class Link {
 
-    String link;
-    int depth;
-    boolean isFinal;
+    private String link;
+    private int depth;
 
-    public Link(String link, int depth, boolean isFinal) {
+    public Link(String link, int depth) {
         this.link = link;
         this.depth = depth;
-        this.isFinal = isFinal;
     }
 
     public String getLink() {
@@ -28,12 +28,17 @@ public class Link {
         this.depth = depth;
     }
 
-    public boolean isFinal() {
-        return isFinal;
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        Link link1 = (Link) object;
+        return depth == link1.depth && Objects.equals(link, link1.link);
     }
 
-    public void setFinal(boolean aFinal) {
-        isFinal = aFinal;
+    @Override
+    public int hashCode() {
+        return Objects.hash(link, depth);
     }
 
     @Override
@@ -41,7 +46,6 @@ public class Link {
         return "Link{" +
                 "link='" + link + '\'' +
                 ", depth=" + depth +
-                ", isFinal=" + isFinal +
                 '}';
     }
 }
