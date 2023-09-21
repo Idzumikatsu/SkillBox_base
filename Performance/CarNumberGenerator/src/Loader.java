@@ -1,5 +1,7 @@
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 public class Loader {
 
@@ -8,28 +10,26 @@ public class Loader {
 
         PrintWriter writer = new PrintWriter("res/numbers.txt");
 
-        char letters[] = {'У', 'К', 'Е', 'Н', 'Х', 'В', 'А', 'Р', 'О', 'С', 'М', 'Т'};
+        char[] letters = {'У', 'К', 'Е', 'Н', 'Х', 'В', 'А', 'Р', 'О', 'С', 'М', 'Т'};
 
-
-
-        for (int number = 1; number < 1000; number++) {
-            int regionCode = 199;
+        for (int regionCode = 0; regionCode < 100; regionCode++) {
             StringBuilder sb = new StringBuilder();
-            for (char firstLetter : letters) {
-                for (char secondLetter : letters) {
-                    for (char thirdLetter : letters) {
-                        sb.append(firstLetter)
-                                .append(padNumber(number, 3))
-                                .append(secondLetter)
-                                .append(thirdLetter)
-                                .append(padNumber(regionCode, 2))
-                                .append("\n");
+            for (int number = 1; number < 1000; number++) {
+                for (char firstLetter : letters) {
+                    for (char secondLetter : letters) {
+                        for (char thirdLetter : letters) {
+                            sb.append(firstLetter)
+                                    .append(padNumber(number, 3))
+                                    .append(secondLetter)
+                                    .append(thirdLetter)
+                                    .append(padNumber(regionCode, 2))
+                                    .append("\n");
+                        }
                     }
                 }
             }
             writer.write(sb.toString());
         }
-
         writer.flush();
         writer.close();
 
@@ -37,13 +37,21 @@ public class Loader {
     }
 
     private static String padNumber(int number, int numberLength) {
-        String numberStr = Integer.toString(number);
-        int padSize = numberLength - numberStr.length();
-
-        for (int i = 0; i < padSize; i++) {
-            numberStr = '0' + numberStr;
+        if (number < 0) {
+            throw new IllegalArgumentException("Число должно быть неотрицательным.");
         }
 
-        return numberStr;
+        char[] paddedNumber = new char[numberLength];
+        char[] numberChars = Integer.toString(number).toCharArray();
+
+        int zerosToAdd = numberLength - numberChars.length;
+        if (zerosToAdd <= 0) {
+            return new String(numberChars);
+        }
+
+        Arrays.fill(paddedNumber, 0, zerosToAdd, '0');
+        System.arraycopy(numberChars, 0, paddedNumber, zerosToAdd, numberChars.length);
+
+        return new String(paddedNumber);
     }
 }
