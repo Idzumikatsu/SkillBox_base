@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.List;
 
 public class DBConnection {
 
@@ -7,8 +8,10 @@ public class DBConnection {
     private static final String dbName = "learn";
     private static final String dbUser = "root";
     private static final String dbPass = "rootuser";
+    private static final int BUFFER_SIZE = 51200;
 
     private static StringBuilder insertQuery = new StringBuilder();
+
     public static Connection getConnection() {
         if (connection == null) {
             try {
@@ -28,9 +31,7 @@ public class DBConnection {
                                 .append("id INT NOT NULL AUTO_INCREMENT, ")
                                 .append("name TINYTEXT NOT NULL, ")
                                 .append("birthDate DATE NOT NULL, ")
-                                .append("`count` INT NOT NULL, ")
-                                .append("PRIMARY KEY(id), ")
-                                .append("UNIQUE KEY name_date(name(50), birthDate))")
+                                .append("PRIMARY KEY(id))")
                                 .toString());
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -39,29 +40,34 @@ public class DBConnection {
         return connection;
     }
 
+    public static void writeDataIntoDB(XMLHandler handler) throws Exception {
+        List<Voter> list = handler.getVotersList();
+        list.forEach(voter -> {
+            if (insertQuery.length() < BUFFER_SIZE){
+                DBConnection.setInsertQuery(voter.getName(), voter.getBirthDay());
+                return;
+            }
+            try {
+                DBConnection.executeMultiInsert();
+                insertQuery.setLength(0);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        DBConnection.executeMultiInsert();
+    }
+
     public static void executeMultiInsert() throws SQLException {
         String sql = new StringBuilder()
-                .append("INSERT INTO voter_count(name, birthDate, `count`) ")
+                .append("INSERT INTO voter_count(name, birthDate) ")
                 .append("VALUES")
                 .append(insertQuery.toString())
-                .append("ON DUPLICATE KEY UPDATE `count`=`count` + 1")
                 .toString();
         DBConnection.getConnection().createStatement().execute(sql);
     }
 
-    public static void countVoter(String name, String birthDay) {
-        birthDay = birthDay.replace('.', '-');
-
+    public static void setInsertQuery(String name, String birthDay) {
         insertQuery.append((insertQuery.isEmpty() ? "" : ",") +
-                "('" + name + "', '" + birthDay + "', 1)");
-    }
-
-    public static void printVoterCounts() throws SQLException {
-        String sql = "SELECT name, birthDate, `count` FROM voter_count WHERE `count` > 1";
-        ResultSet rs = DBConnection.getConnection().createStatement().executeQuery(sql);
-        while (rs.next()) {
-            System.out.println("\t" + rs.getString("name") + " (" +
-                    rs.getString("birthDate") + ") - " + rs.getInt("count"));
-        }
+                "('" + name + "', '" + birthDay + "')");
     }
 }
