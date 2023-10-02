@@ -1,12 +1,11 @@
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class Voter {
 
     private String name;
-    private Date birthDay;
+    private String birthDay;
 
-    public Voter(String name, Date birthDay) {
+    public Voter(String name, String birthDay) {
         this.name = name;
         this.birthDay = birthDay;
     }
@@ -35,7 +34,7 @@ public class Voter {
         return name;
     }
 
-    public Date getBirthDay() {
+    public String getBirthDay() {
         return birthDay;
     }
 }
